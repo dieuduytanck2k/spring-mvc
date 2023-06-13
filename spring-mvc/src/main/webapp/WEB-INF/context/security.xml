@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+            http://www.springframework.org/schema/security
+            http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+            
+    <http auto-config="false" use-expressions="true" disable-url-rewriting="true">
+    	
+    	<!-- Bắt lỗi với người dùng chưa đăng nhập cố truy cập vào trang admin redirect về trang-chu-->
+    	<intercept-url pattern="/quan-tri/trang-chu" access="hasAnyRole('ADMIN')" />
+    
+    	<!-- trỏ về controller /accessDenied khi cố truy cập vào /quan-tri/trang-chu mà trong trạng thái USER -->
+		<access-denied-handler error-page="/accessDenied" />
+		<!-- login-page: do bulding theo spring security nên cần phải apply form login vào một page nào đó và đó là page login có controller là dang-nhap-->
+		<!-- login-processing-url là nơi nhận url chứa các action mà spring đã viết sẵn và có tên là j_spring_security_check-->
+		<!-- username-parameter và password-parameter được spring security quy định để truyền vào từ form submit-->
+		<!-- Nếu authentication thành công thông tin sẽ được đưa vào customSuccessHandler để thực hiện authorization-->
+		<!-- khai báo hàm lỗi authentication-failure-url dùng để redirect lại trang login, biến incorrectAccount dùng để thông báo lỗi-->
+		<form-login login-page="/dang-nhap"
+					username-parameter="j_username" 
+					password-parameter="j_password"
+					login-processing-url="/j_spring_security_check" 
+					authentication-success-handler-ref="customSuccessHandler"
+					authentication-failure-url="/dang-nhap?incorrectAccount" />
+		<!-- session-management quy định thời gian thao tác, tự logout tài khoản về trang /dang-nhap-->
+		<!-- biến sessionTimeout dùng để thông báo -->
+		<!--  <session-management invalid-session-url="/dang-nhap?sessionTimeout" /> -->
+		<logout delete-cookies="JSESSIONID" />  
+		
+    </http>
+    
+    <!-- Cấu hình để xử lí mã MD5 -->
+    <authentication-manager >
+        <authentication-provider user-service-ref="customUserDetailsService">
+        		<password-encoder ref="bcryptEncoder"/>
+        </authentication-provider>
+    </authentication-manager>
+    
+    <!-- Kiểu submit vào id xong class sẽ redirect đến địa chỉ -->
+    <!-- Gọi bcryptEncoder -->
+    <beans:bean id="bcryptEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
+    <!-- Gọi CustomUserDetailsService -->
+    <beans:bean id="customUserDetailsService" class="com.laptrinhjavaweb.service.impl.CustomUserDetailsService" />
+    <!-- Gọi customSuccessHandler -->
+    <beans:bean id="customSuccessHandler" class="com.laptrinhjavaweb.security.CustomSuccessHandler" />
+
+</beans:beans>

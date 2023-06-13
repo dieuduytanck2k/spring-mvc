@@ -1,0 +1,44 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+
+   xmlns:context="http://www.springframework.org/schema/context"
+
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+
+   xmlns:mvc="http://www.springframework.org/schema/mvc"
+
+   xsi:schemaLocation="
+
+        http://www.springframework.org/schema/beans
+
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+
+        http://www.springframework.org/schema/mvc
+
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+
+        http://www.springframework.org/schema/context
+
+              http://www.springframework.org/schema/context/spring-context.xsd">
+	
+	<!-- request trỏ đến vị trí của com.laptrinhjavaweb.controller tìm controller-->
+   <context:component-scan
+      base-package="com.laptrinhjavaweb.controller, com.laptrinhjavaweb.api" />
+
+	<!-- (Bắt buộc)khai báo để dùng anotation như @Controller @Requestmapping..-->
+   <mvc:annotation-driven />
+
+	<!-- Khi model and view trả ra file thì ViewResolver sẽ tìm file đó -->
+   <bean
+      class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+      
+		<!-- prefix nơi chứa tất cả các file view -->
+      <property name="prefix" value="/WEB-INF/views/" />
+
+		<!-- suffix định dạng đuôi của file -->
+      <property name="suffix" value=".jsp" />
+
+   </bean>
+   <!-- template trong mapping không phải là foler mà là tiền tố định nghĩa trong file dispatcher-servlet -->
+   <!-- trỏ vào folder template -->
+   <mvc:resources mapping="/template/**" location="/template/" />
+</beans>
